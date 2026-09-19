@@ -23,3 +23,5 @@ Abrir http://localhost:3000
 - `middleware/` registro de peticiones y manejo de errores
 - `helpers/` funciones de apoyo
 - `public/` interfaz web
+
+Módulo de reportes: pendiente de desarrollo.
