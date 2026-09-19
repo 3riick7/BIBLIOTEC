@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "titulo": "Cien a\u00f1os de soledad",
+    "autor": "Gabriel Garc\u00eda M\u00e1rquez",
+    "ejemplares": 3,
+    "disponibles": 3
+  },
+  {
+    "id": 2,
+    "titulo": "La ciudad y los perros",
+    "autor": "Mario Vargas Llosa",
+    "ejemplares": 2,
+    "disponibles": 2
+  },
+  {
+    "id": 3,
+    "titulo": "El Principito",
+    "autor": "Antoine de Saint-Exup\u00e9ry",
+    "ejemplares": 4,
+    "disponibles": 4
+  }
+]

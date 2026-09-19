@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BiblioTec</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header><h1>BiblioTec</h1><p>Gestión de biblioteca</p></header>
+  <main>
+    <section>
+      <h2>Libros</h2>
+      <input id="buscar" placeholder="Buscar por título o autor">
+      <table id="tabla-libros"><thead><tr><th>Título</th><th>Autor</th><th>Disponibles</th></tr></thead><tbody></tbody></table>
+    </section>
+    <section>
+      <h2>Registrar préstamo</h2>
+      <form id="form-prestamo">
+        <select id="sel-libro"></select>
+        <select id="sel-socio"></select>
+        <button>Prestar</button>
+      </form>
+      <p id="mensaje"></p>
+    </section>
+    <section>
+      <h2>Préstamos</h2>
+      <table id="tabla-prestamos"><thead><tr><th>Libro</th><th>Socio</th><th>Límite</th><th></th></tr></thead><tbody></tbody></table>
+    </section>
+  </main>
+  <script src="js/app.js"></script>
+</body>
+</html>
