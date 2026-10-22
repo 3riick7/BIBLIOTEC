@@ -3,41 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BiblioTec</title>
+  <title>BiblioTec · Gestión de biblioteca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-  <header><h1>BiblioTec</h1><p>Gestión de biblioteca</p></header>
+  <aside class="lateral">
+    <div class="marca">
+      <span class="logo">B</span>
+      <div>
+        <strong>BiblioTec</strong>
+        <small>Gestión de biblioteca</small>
+      </div>
+    </div>
+    <nav>
+      <button class="nav activo" data-vista="panel">Panel</button>
+      <button class="nav" data-vista="libros">Libros</button>
+      <button class="nav" data-vista="socios">Socios</button>
+      <button class="nav" data-vista="prestamos">Préstamos <span id="badge-atrasados" class="badge-nav" hidden></span></button>
+    </nav>
+    <p class="pie-lateral">Node.js · Express · Git</p>
+  </aside>
+
   <main>
-    <section>
-      <h2>Catálogo de libros</h2>
-      <p>Los préstamos vencidos aparecen como "Atrasado" en la sección Préstamos.</p>
-      <input id="buscar" placeholder="Buscar por título o autor">
-      <table id="tabla-libros"><thead><tr><th>Título</th><th>Autor</th><th>Disponibles</th></tr></thead><tbody></tbody></table>
+    <!-- PANEL -->
+    <section id="vista-panel" class="vista activa">
+      <header class="titulo">
+        <div>
+          <h1>Panel general</h1>
+          <p id="fecha-hoy" class="sub"></p>
+        </div>
+      </header>
+      <div class="tarjetas">
+        <article class="tarjeta"><span>Libros</span><strong id="r-libros">–</strong><small id="r-ejemplares"></small></article>
+        <article class="tarjeta"><span>Socios</span><strong id="r-socios">–</strong><small>registrados</small></article>
+        <article class="tarjeta"><span>Préstamos activos</span><strong id="r-activos">–</strong><small>sin devolver</small></article>
+        <article class="tarjeta alerta"><span>Atrasados</span><strong id="r-atrasados">–</strong><small>pasaron su fecha límite</small></article>
+      </div>
+      <div class="dos-columnas">
+        <article class="caja">
+          <h2>Préstamos atrasados</h2>
+          <ul id="lista-atrasados" class="lista"></ul>
+        </article>
+        <article class="caja">
+          <h2>Libro más prestado</h2>
+          <p id="r-top" class="destacado">–</p>
+          <h2>Disponibilidad del catálogo</h2>
+          <div class="barra"><div id="barra-disp"></div></div>
+          <p id="r-disp" class="sub"></p>
+        </article>
+      </div>
     </section>
-    <section>
-      <h2>Registrar préstamo</h2>
-      <form id="form-prestamo">
-        <select id="sel-libro"></select>
-        <select id="sel-socio"></select>
-        <button>Prestar</button>
+
+    <!-- LIBROS -->
+    <section id="vista-libros" class="vista">
+      <header class="titulo">
+        <div><h1>Libros</h1><p class="sub">Catálogo y ejemplares disponibles</p></div>
+        <input id="buscar" class="buscador" placeholder="Buscar por título o autor">
+      </header>
+      <form id="form-libro" class="caja formulario">
+        <input name="titulo" placeholder="Título" required>
+        <input name="autor" placeholder="Autor" required>
+        <input name="ejemplares" type="number" min="1" value="1" title="Ejemplares">
+        <button class="primario">Agregar libro</button>
       </form>
-      <p id="mensaje"></p>
+      <div class="caja"><table id="tabla-libros">
+        <thead><tr><th>Título</th><th>Autor</th><th>Disponibles</th><th></th></tr></thead><tbody></tbody>
+      </table></div>
     </section>
-    <section>
-      <h2>Préstamos</h2>
-      <table id="tabla-prestamos"><thead><tr><th>Libro</th><th>Socio</th><th>Límite</th><th></th></tr></thead><tbody></tbody></table>
+
+    <!-- SOCIOS -->
+    <section id="vista-socios" class="vista">
+      <header class="titulo">
+        <div><h1>Socios</h1><p class="sub">Personas registradas en la biblioteca</p></div>
+        <input id="buscar-socio" class="buscador" placeholder="Buscar por nombre o DNI">
+      </header>
+      <form id="form-socio" class="caja formulario">
+        <input name="nombre" placeholder="Nombre completo" required>
+        <input name="dni" placeholder="DNI (8 dígitos)" pattern="\d{8}" maxlength="8" required>
+        <input name="correo" type="email" placeholder="Correo (opcional)">
+        <button class="primario">Registrar socio</button>
+      </form>
+      <div class="caja"><table id="tabla-socios">
+        <thead><tr><th>Nombre</th><th>DNI</th><th>Correo</th><th>Préstamos activos</th></tr></thead><tbody></tbody>
+      </table></div>
     </section>
-    <section>
-      <h2>Socios</h2>
-      <input id="buscar-socio" placeholder="Buscar por nombre o DNI">
-      <table id="tabla-socios"><thead><tr><th>Nombre</th><th>DNI</th><th>Correo</th></tr></thead><tbody></tbody></table>
-    </section>
-    <section>
-      <h2>Reportes</h2>
-      <ul id="reporte"></ul>
+
+    <!-- PRÉSTAMOS -->
+    <section id="vista-prestamos" class="vista">
+      <header class="titulo">
+        <div><h1>Préstamos</h1><p class="sub">Registro de préstamos y devoluciones</p></div>
+      </header>
+      <form id="form-prestamo" class="caja formulario">
+        <select id="sel-libro" title="Libro"></select>
+        <select id="sel-socio" title="Socio"></select>
+        <button class="primario">Registrar préstamo</button>
+      </form>
+      <div class="filtros">
+        <button class="chip activo" data-filtro="todos">Todos</button>
+        <button class="chip" data-filtro="activos">Activos</button>
+        <button class="chip" data-filtro="atrasados">Atrasados</button>
+        <button class="chip" data-filtro="devueltos">Devueltos</button>
+      </div>
+      <div class="caja"><table id="tabla-prestamos">
+        <thead><tr><th>Libro</th><th>Socio</th><th>Préstamo</th><th>Límite</th><th>Estado</th><th></th></tr></thead><tbody></tbody>
+      </table></div>
     </section>
   </main>
+
+  <div id="aviso" class="aviso" role="status"></div>
   <script src="js/app.js"></script>
 </body>
 </html>
