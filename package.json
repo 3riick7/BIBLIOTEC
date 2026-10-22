@@ -1,6 +1,6 @@
 {
   "name": "bibliotec",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Sistema web de gestión de biblioteca: libros, socios y préstamos",
   "main": "app.js",
   "scripts": {
