@@ -24,4 +24,8 @@ Abrir http://localhost:3000
 - `helpers/` funciones de apoyo
 - `public/` interfaz web
 
-Módulo de reportes: pendiente de desarrollo.
+## Módulo de reportes
+
+`GET /api/reportes/resumen` devuelve el total de libros y ejemplares, socios,
+préstamos activos, préstamos atrasados y el libro más prestado.
+La interfaz muestra este resumen en la sección Reportes.
