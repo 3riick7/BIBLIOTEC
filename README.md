@@ -1,7 +1,7 @@
 # BiblioTec
 
 Sistema web de gestión de biblioteca desarrollado con Node.js y Express.
-Permite administrar libros, socios y préstamos, con búsqueda de socios y control de atrasos.
+Permite administrar libros, socios, préstamos y reportes, con búsqueda de socios y control de atrasos.
 
 ## Instalación
 
