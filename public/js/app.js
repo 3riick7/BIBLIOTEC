@@ -11,6 +11,16 @@ async function cargar() {
   document.getElementById('sel-socio').innerHTML =
     socios.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
   pintarPrestamos(prestamos);
+  pintarReporte((await api('/reportes/resumen')).datos);
+}
+
+function pintarReporte(r) {
+  document.getElementById('reporte').innerHTML = `
+    <li>Libros registrados: ${r.totalLibros} (${r.ejemplaresDisponibles}/${r.totalEjemplares} ejemplares disponibles)</li>
+    <li>Socios registrados: ${r.totalSocios}</li>
+    <li>Préstamos activos: ${r.prestamosActivos}</li>
+    <li>Préstamos atrasados: ${r.prestamosAtrasados}</li>
+    <li>Libro más prestado: ${r.libroMasPrestado || 'Sin préstamos todavía'}</li>`;
 }
 
 function pintarLibros(lista) {
@@ -21,8 +31,10 @@ function pintarLibros(lista) {
 function pintarPrestamos(lista) {
   document.querySelector('#tabla-prestamos tbody').innerHTML = lista.map(p => {
     const l = libros.find(x => x.id === p.idLibro), s = socios.find(x => x.id === p.idSocio);
+    const hoy = new Date().toISOString().slice(0, 10);
+    const estado = !p.devuelto && p.fechaLimite < hoy ? ' <strong>(Atrasado)</strong>' : '';
     const accion = p.devuelto ? 'Devuelto' : `<button onclick="devolver(${p.id})">Devolver</button>`;
-    return `<tr><td>${l ? l.titulo : '-'}</td><td>${s ? s.nombre : '-'}</td><td>${p.fechaLimite}</td><td>${accion}</td></tr>`;
+    return `<tr><td>${l ? l.titulo : '-'}</td><td>${s ? s.nombre : '-'}</td><td>${p.fechaLimite}${estado}</td><td>${accion}</td></tr>`;
   }).join('');
 }
 
