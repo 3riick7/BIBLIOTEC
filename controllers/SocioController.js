@@ -1,7 +1,13 @@
 const Socio = require('../models/SocioModel');
 const { ok, error } = require('../helpers/response');
 
-exports.listar = (req, res) => ok(res, Socio.todos());
+// Permite buscar socios por nombre o DNI con ?q=
+exports.listar = (req, res) => {
+  const q = (req.query.q || '').toLowerCase();
+  const socios = Socio.todos().filter(s =>
+    s.nombre.toLowerCase().includes(q) || s.dni.includes(q));
+  ok(res, socios);
+};
 exports.obtener = (req, res) => {
   const s = Socio.buscar(parseInt(req.params.id, 10));
   s ? ok(res, s) : error(res, 'Socio no encontrado', 404);
