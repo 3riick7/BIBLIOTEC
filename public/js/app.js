@@ -11,6 +11,12 @@ async function cargar() {
   document.getElementById('sel-socio').innerHTML =
     socios.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
   pintarPrestamos(prestamos);
+  pintarSocios(socios);
+}
+
+function pintarSocios(lista) {
+  document.querySelector('#tabla-socios tbody').innerHTML = lista.map(s =>
+    `<tr><td>${s.nombre}</td><td>${s.dni}</td><td>${s.correo}</td></tr>`).join('');
 }
 
 function pintarLibros(lista) {
@@ -28,6 +34,9 @@ function pintarPrestamos(lista) {
 
 document.getElementById('buscar').oninput = async e =>
   pintarLibros((await api('/libros?q=' + encodeURIComponent(e.target.value))).datos);
+
+document.getElementById('buscar-socio').oninput = async e =>
+  pintarSocios((await api('/socios?q=' + encodeURIComponent(e.target.value))).datos);
 
 document.getElementById('form-prestamo').onsubmit = async e => {
   e.preventDefault();
