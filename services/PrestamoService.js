@@ -27,6 +27,8 @@ exports.devolver = idPrestamo => {
   const p = Prestamo.buscar(idPrestamo);
   if (!p) throw new Error('El préstamo no existe');
   if (p.devuelto) throw new Error('El préstamo ya fue devuelto');
+  const libro = Libro.buscar(p.idLibro);
+  Libro.actualizar(p.idLibro, { disponibles: libro.disponibles + 1 });
   return Prestamo.marcarDevuelto(idPrestamo, hoy());
 };
 
