@@ -11,6 +11,16 @@ async function cargar() {
   document.getElementById('sel-socio').innerHTML =
     socios.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
   pintarPrestamos(prestamos);
+  pintarReporte((await api('/reportes/resumen')).datos);
+}
+
+function pintarReporte(r) {
+  document.getElementById('reporte').innerHTML = `
+    <li>Libros registrados: ${r.totalLibros} (${r.ejemplaresDisponibles}/${r.totalEjemplares} ejemplares disponibles)</li>
+    <li>Socios registrados: ${r.totalSocios}</li>
+    <li>Préstamos activos: ${r.prestamosActivos}</li>
+    <li>Préstamos atrasados: ${r.prestamosAtrasados}</li>
+    <li>Libro más prestado: ${r.libroMasPrestado || 'Sin préstamos todavía'}</li>`;
 }
 
 function pintarLibros(lista) {
