@@ -11,7 +11,9 @@ exports.prestar = (req, res) => {
   } catch (e) { error(res, e.message); }
 };
 exports.devolver = (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return error(res, 'El id del préstamo debe ser numérico');
   try {
-    ok(res, PrestamoService.devolver(parseInt(req.params.id, 10)));
+    ok(res, PrestamoService.devolver(id));
   } catch (e) { error(res, e.message); }
 };
