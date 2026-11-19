@@ -7,7 +7,7 @@ const { noEncontrado, manejarErrores } = require('./middleware/errores');
 const rutas = require('./routes');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '3mb' })); // admite portadas de hasta 2 MB
 app.use(logger);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', rutas);
