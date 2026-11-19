@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const necesarios = ['app.js', 'package.json', 'data/libros.json', 'data/socios.json', 'data/prestamos.json'];
+const necesarios = ['app.js', 'package.json', 'data/libros.json', 'data/socios.json', 'data/prestamos.json', 'data/reservas.json'];
 let falta = false;
 for (const f of necesarios) {
   if (!fs.existsSync(path.join(__dirname, '..', f))) { console.log('Falta: ' + f); falta = true; }

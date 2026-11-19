@@ -49,3 +49,14 @@ no puede pedir nuevos préstamos hasta pagarlas.
 - `GET /api/multas` lista las multas (pendientes, pagadas y en curso) con sus totales.
 - `PUT /api/multas/:idPrestamo/pagar` registra el pago de una multa.
 - `GET /api/socios/:id/historial` devuelve todos los préstamos de un socio y su deuda pendiente.
+
+## Reservas
+
+Si un libro no tiene ejemplares disponibles, un socio puede reservarlo y entra a una cola de espera.
+Cuando se devuelve un ejemplar, queda apartado para el primero de la cola durante 3 días
+(estado “lista”); al prestárselo, la reserva pasa a “cumplida”. Si se cancela una reserva lista,
+el ejemplar pasa al siguiente de la cola o vuelve al catálogo.
+
+- `GET /api/reservas` lista las reservas con su estado y su puesto en la cola.
+- `POST /api/reservas` recibe `{ "idLibro": 8, "idSocio": 2 }` (solo para libros agotados).
+- `PUT /api/reservas/:id/cancelar` cancela una reserva.
