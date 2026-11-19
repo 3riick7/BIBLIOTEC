@@ -22,6 +22,7 @@
       <button class="nav" data-vista="libros">Libros</button>
       <button class="nav" data-vista="socios">Socios</button>
       <button class="nav" data-vista="prestamos">Préstamos <span id="badge-atrasados" class="badge-nav" hidden></span></button>
+      <button class="nav" data-vista="multas">Multas <span id="badge-multas" class="badge-nav" hidden></span></button>
     </nav>
     <p class="pie-lateral">Node.js · Express · Git</p>
   </aside>
@@ -40,6 +41,7 @@
         <article class="tarjeta"><span>Socios</span><strong id="r-socios">–</strong><small>registrados</small></article>
         <article class="tarjeta"><span>Préstamos activos</span><strong id="r-activos">–</strong><small>sin devolver</small></article>
         <article class="tarjeta alerta"><span>Atrasados</span><strong id="r-atrasados">–</strong><small>pasaron su fecha límite</small></article>
+        <article class="tarjeta alerta"><span>Multas pendientes</span><strong id="r-multas">–</strong><small id="r-multas-det">por cobrar</small></article>
       </div>
       <div class="dos-columnas">
         <article class="caja">
@@ -91,7 +93,7 @@
         <button class="primario">Registrar socio</button>
       </form>
       <div class="caja"><table id="tabla-socios">
-        <thead><tr><th>Nombre</th><th>DNI</th><th>Correo</th><th>Préstamos activos</th></tr></thead><tbody></tbody>
+        <thead><tr><th>Nombre</th><th>DNI</th><th>Correo</th><th>Préstamos activos</th><th></th></tr></thead><tbody></tbody>
       </table></div>
     </section>
 
@@ -115,7 +117,26 @@
         <thead><tr><th>Libro</th><th>Socio</th><th>Préstamo</th><th>Límite</th><th>Estado</th><th></th></tr></thead><tbody></tbody>
       </table></div>
     </section>
+    <!-- MULTAS -->
+    <section id="vista-multas" class="vista">
+      <header class="titulo">
+        <div><h1>Multas</h1><p class="sub" id="tarifa-multa">Multas por devolver libros después de la fecha límite</p></div>
+      </header>
+      <div class="tarjetas">
+        <article class="tarjeta alerta"><span>Pendiente de cobro</span><strong id="m-pendiente">–</strong><small id="m-cantidad"></small></article>
+        <article class="tarjeta"><span>En curso</span><strong id="m-curso">–</strong><small>préstamos atrasados aún sin devolver</small></article>
+        <article class="tarjeta"><span>Cobrado</span><strong id="m-cobrado">–</strong><small>multas pagadas</small></article>
+      </div>
+      <div class="caja"><table id="tabla-multas">
+        <thead><tr><th>Socio</th><th>Libro</th><th>Límite</th><th>Días de atraso</th><th>Monto</th><th>Estado</th><th></th></tr></thead><tbody></tbody>
+      </table></div>
+    </section>
   </main>
+
+  <dialog id="dlg-historial" class="dialogo">
+    <header><div><h2 id="h-nombre"></h2><p class="sub" id="h-resumen"></p></div><button class="secundario" onclick="this.closest('dialog').close()">Cerrar</button></header>
+    <table><thead><tr><th>Libro</th><th>Préstamo</th><th>Límite</th><th>Devolución</th><th>Estado</th><th>Multa</th></tr></thead><tbody id="h-filas"></tbody></table>
+  </dialog>
 
   <div id="aviso" class="aviso" role="status"></div>
   <script src="js/app.js"></script>
