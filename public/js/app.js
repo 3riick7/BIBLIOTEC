@@ -4,7 +4,7 @@ const $ = sel => document.querySelector(sel);
 const hoy = () => new Date().toISOString().slice(0, 10);
 const fecha = f => f ? new Date(f + 'T00:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '–';
 
-let libros = [], socios = [], prestamos = [], filtro = 'todos';
+let libros = [], socios = [], prestamos = [], reservas = [], filtro = 'todos';
 const soles = n => 'S/ ' + Number(n || 0).toFixed(2);
 
 function aviso(texto, esError = false) {
@@ -25,16 +25,18 @@ document.querySelectorAll('.nav').forEach(b => b.onclick = () => {
 
 // ---------- Carga general
 async function cargar() {
-  [libros, socios, prestamos] = await Promise.all([api('/libros'), api('/socios'), api('/prestamos')]).then(r => r.map(x => x.datos));
+  [libros, socios, prestamos, reservas] = await Promise.all([api('/libros'), api('/socios'), api('/prestamos'), api('/reservas')]).then(r => r.map(x => x.datos));
   filtrarLibros();
   cargarCategorias();
   pintarSocios(socios);
   pintarPrestamos();
   $('#sel-libro').innerHTML = libros.map(l =>
-    `<option value="${l.id}" ${l.disponibles < 1 ? 'disabled' : ''}>${l.titulo} (${l.disponibles} disp.)</option>`).join('');
+    `<option value="${l.id}">${l.titulo} ${l.disponibles < 1 ? '(agotado · reservar)' : `(${l.disponibles} disp.)`}</option>`).join('');
   $('#sel-socio').innerHTML = socios.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
   pintarReporte((await api('/reportes/resumen')).datos);
   pintarMultas((await api('/multas')).datos);
+  pintarReservas();
+  modoPrestamo();
 }
 
 // ---------- Panel
@@ -48,6 +50,8 @@ function pintarReporte(r) {
   const pct = r.totalEjemplares ? Math.round(r.ejemplaresDisponibles / r.totalEjemplares * 100) : 0;
   $('#barra-disp').style.width = pct + '%';
   $('#r-disp').textContent = `${r.ejemplaresDisponibles} de ${r.totalEjemplares} ejemplares en estantería (${pct}%)`;
+  $('#r-reservas').textContent = r.reservas.listas;
+  $('#r-reservas-det').textContent = `listas para recoger · ${r.reservas.pendientes} en cola`;
   $('#r-multas').textContent = soles(r.multas.pendiente);
   $('#r-multas-det').textContent = `${r.multas.cantidadPendientes} por cobrar · ${soles(r.multas.enCurso)} en curso`;
   const b = $('#badge-atrasados');
@@ -83,6 +87,7 @@ function pintarLibros(lista) {
       ${portada(l)}
       <div class="libro-info">
         <span class="etiqueta">${l.categoria || 'Otros'}</span>
+        ${l.disponibles < 1 ? `<span class="agotado">Agotado${enCola(l.id) ? ` · ${enCola(l.id)} en cola` : ''}</span>` : ''}
         <strong>${l.titulo}</strong><span class="sub">${l.autor}</span>
         <div class="disp"><div class="barra"><div style="width:${pct}%"></div></div>${l.disponibles}/${l.ejemplares}</div>
         <div class="acciones">
@@ -178,15 +183,69 @@ document.querySelectorAll('#vista-prestamos .chip').forEach(c => c.onclick = () 
   document.querySelectorAll('#vista-prestamos .chip').forEach(x => x.classList.toggle('activo', x === c));
   pintarPrestamos();
 });
+// Si el libro está agotado y el socio no tiene un ejemplar apartado, el formulario reserva en lugar de prestar
+const necesitaReserva = () => {
+  const idLibro = +$('#sel-libro').value, idSocio = +$('#sel-socio').value;
+  const libro = libros.find(l => l.id === idLibro);
+  const apartado = reservas.some(r => r.idLibro === idLibro && r.idSocio === idSocio && r.estado === 'lista');
+  return libro && libro.disponibles < 1 && !apartado;
+};
+function modoPrestamo() {
+  const reservar = necesitaReserva();
+  $('#btn-prestar').textContent = reservar ? 'Reservar' : 'Registrar préstamo';
+  const nota = $('#nota-reserva');
+  nota.hidden = !reservar;
+  if (reservar) {
+    const n = enCola(+$('#sel-libro').value);
+    nota.textContent = `Este libro no tiene ejemplares disponibles. Al reservar, el socio entra a la cola (${n} persona(s) antes que él) y se le aparta el próximo ejemplar que se devuelva.`;
+  }
+}
+$('#sel-libro').onchange = modoPrestamo;
+$('#sel-socio').onchange = modoPrestamo;
 $('#form-prestamo').onsubmit = async e => {
   e.preventDefault();
-  const r = await api('/prestamos', json('POST', { idLibro: $('#sel-libro').value, idSocio: $('#sel-socio').value }));
-  aviso(r.ok ? `Préstamo registrado. Devolver hasta el ${fecha(r.datos.fechaLimite)}` : r.mensaje, !r.ok);
+  const datos = { idLibro: $('#sel-libro').value, idSocio: $('#sel-socio').value };
+  if (necesitaReserva()) {
+    const r = await api('/reservas', json('POST', datos));
+    aviso(r.ok ? 'Reserva registrada: el socio está en la cola de espera' : r.mensaje, !r.ok);
+  } else {
+    const r = await api('/prestamos', json('POST', datos));
+    aviso(r.ok ? `Préstamo registrado. Devolver hasta el ${fecha(r.datos.fechaLimite)}` : r.mensaje, !r.ok);
+  }
   cargar();
 };
 window.devolver = async id => {
   const r = await api(`/prestamos/${id}/devolver`, { method: 'PUT' });
   aviso(r.ok ? 'Devolución registrada' : r.mensaje, !r.ok);
+  cargar();
+};
+
+// ---------- Reservas
+const enCola = idLibro => reservas.filter(r => r.idLibro === idLibro && r.estado === 'pendiente').length;
+function pintarReservas() {
+  const listas = reservas.filter(r => r.estado === 'lista').length;
+  $('#rv-listas').textContent = listas;
+  $('#rv-cola').textContent = reservas.filter(r => r.estado === 'pendiente').length;
+  const b = $('#badge-reservas'); b.hidden = !listas; b.textContent = listas;
+  $('#tabla-reservas tbody').innerHTML = reservas.length ? reservas.map(r => {
+    const estado = { lista: `<span class="estado lista">Lista · recoger hasta ${fecha(r.recogerHasta)}</span>`,
+      pendiente: `<span class="estado encola">En cola · puesto ${r.posicion}</span>`,
+      cumplida: `<span class="estado cumplida">Prestado ${fecha(r.fechaCumplida)}</span>`,
+      cancelada: '<span class="estado cancelada">Cancelada</span>' }[r.estado];
+    const acciones = r.estado === 'lista'
+      ? `<button class="primario" onclick="prestarReserva(${r.idLibro}, ${r.idSocio})">Prestar</button><button class="secundario peligro" onclick="cancelarReserva(${r.id})">Cancelar</button>`
+      : r.estado === 'pendiente' ? `<button class="secundario peligro" onclick="cancelarReserva(${r.id})">Cancelar</button>` : '';
+    return `<tr><td><strong>${r.libro}</strong></td><td>${r.socio}</td><td>${fecha(r.fecha)}</td><td>${estado}</td><td><div class="fila-acciones">${acciones}</div></td></tr>`;
+  }).join('') : '<tr><td colspan="5" class="vacio">No hay reservas.</td></tr>';
+}
+window.prestarReserva = async (idLibro, idSocio) => {
+  const r = await api('/prestamos', json('POST', { idLibro, idSocio }));
+  aviso(r.ok ? `Préstamo registrado. Devolver hasta el ${fecha(r.datos.fechaLimite)}` : r.mensaje, !r.ok);
+  cargar();
+};
+window.cancelarReserva = async id => {
+  const r = await api(`/reservas/${id}/cancelar`, { method: 'PUT' });
+  aviso(r.ok ? 'Reserva cancelada' : r.mensaje, !r.ok);
   cargar();
 };
 
