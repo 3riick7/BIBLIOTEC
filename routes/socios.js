@@ -3,6 +3,7 @@ const c = require('../controllers/SocioController');
 
 router.get('/', c.listar);
 router.get('/:id', c.obtener);
+router.get('/:id/historial', c.historial);
 router.post('/', c.crear);
 router.put('/:id', c.actualizar);
 router.delete('/:id', c.eliminar);
