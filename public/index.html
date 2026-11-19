@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3a2c9c">
   <title>BiblioTec · Gestión de biblioteca</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
@@ -16,14 +17,15 @@
         <strong>BiblioTec</strong>
         <small>Gestión de biblioteca</small>
       </div>
+      <button class="menu" id="btn-menu" aria-label="Abrir menú" aria-expanded="false"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     </div>
     <nav>
-      <button class="nav activo" data-vista="panel">Panel</button>
-      <button class="nav" data-vista="libros">Libros</button>
-      <button class="nav" data-vista="socios">Socios</button>
-      <button class="nav" data-vista="prestamos">Préstamos <span id="badge-atrasados" class="badge-nav" hidden></span></button>
-      <button class="nav" data-vista="reservas">Reservas <span id="badge-reservas" class="badge-nav aviso-nav" hidden></span></button>
-      <button class="nav" data-vista="multas">Multas <span id="badge-multas" class="badge-nav" hidden></span></button>
+      <button class="nav activo" data-vista="panel"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span class="txt">Panel</span> </button>
+      <button class="nav" data-vista="libros"><svg class="ic" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span class="txt">Libros</span> </button>
+      <button class="nav" data-vista="socios"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 20a6.5 6.5 0 0 0-3-5.5"/></svg><span class="txt">Socios</span> </button>
+      <button class="nav" data-vista="prestamos"><svg class="ic" viewBox="0 0 24 24"><path d="M7 7h13l-4-4M17 17H4l4 4"/></svg><span class="txt">Préstamos</span> <span id="badge-atrasados" class="badge-nav" hidden></span></button>
+      <button class="nav" data-vista="reservas"><svg class="ic" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="txt">Reservas</span> <span id="badge-reservas" class="badge-nav aviso-nav" hidden></span></button>
+      <button class="nav" data-vista="multas"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .8-3 2s1.3 1.7 3 2 3 .8 3 2-1.3 2-3 2c-1.4 0-2.5-.5-3-1.5M12 6v2M12 16v2"/></svg><span class="txt">Multas</span> <span id="badge-multas" class="badge-nav" hidden></span></button>
     </nav>
     <p class="pie-lateral">Node.js · Express · Git</p>
   </aside>
