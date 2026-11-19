@@ -24,3 +24,9 @@
 1. `git status` para revisar qué se va a confirmar.
 2. `npm run check` para verificar los archivos del proyecto.
 3. Nunca subir `.env` ni `node_modules` (ya están en `.gitignore`).
+
+## Versiones
+- Se sigue el formato MAYOR.MENOR.PARCHE (por ejemplo, 1.2.0).
+- Cada entrega se marca con una etiqueta anotada: `git tag -a v1.2.0 -m "..."` y `git push origin v1.2.0`.
+- v1.1.0: reportes, búsqueda de socios, validación de devoluciones y nueva interfaz.
+- v1.2.0: portadas y categorías, multas e historial de socios, y reservas.
