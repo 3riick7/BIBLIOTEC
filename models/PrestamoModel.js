@@ -11,12 +11,14 @@ exports.crear = datos => {
   db.guardar('prestamos', lista);
   return nuevo;
 };
-exports.marcarDevuelto = (id, fecha) => {
+exports.actualizar = (id, cambios) => {
   const lista = db.leer('prestamos');
   const p = lista.find(x => x.id === id);
   if (!p) return null;
-  p.devuelto = true;
-  p.fechaDevolucion = fecha;
+  Object.assign(p, cambios);
   db.guardar('prestamos', lista);
   return p;
 };
+exports.marcarDevuelto = (id, fecha, extra = {}) =>
+  exports.actualizar(id, { devuelto: true, fechaDevolucion: fecha, ...extra });
+exports.deSocio = idSocio => db.leer('prestamos').filter(p => p.idSocio === idSocio);
