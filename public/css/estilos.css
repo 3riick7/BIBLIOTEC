@@ -54,7 +54,7 @@ h2 { font-size: 18px; margin: 0 0 12px; }
 .sub { color: var(--suave); margin: 4px 0 0; }
 
 .caja { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: var(--radio); padding: 20px; margin-bottom: 18px; }
-.tarjetas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 18px; }
 .tarjeta { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px; display: flex; flex-direction: column; gap: 4px; }
 .tarjeta span { color: var(--suave); font-size: 13px; font-weight: 500; }
 .tarjeta strong { font: 700 34px 'Fraunces', serif; color: var(--verde); }
@@ -125,6 +125,16 @@ td:last-child { text-align: right; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .archivo:hover { border-color: var(--verde); color: var(--verde); }
 .chip small { opacity: .6; margin-left: 2px; }
+
+/* Multas e historial */
+.estado.pendiente { background: var(--rojo-claro); color: var(--rojo); }
+.estado.pagada { background: var(--verde-claro); color: var(--verde); }
+.estado.encurso { background: var(--ambar-claro); color: var(--ambar); }
+.multa { display: block; font-size: 12px; color: var(--rojo); font-weight: 600; }
+.dialogo { border: 0; border-radius: var(--radio); padding: 24px; width: min(760px, 94vw); background: var(--tarjeta); color: var(--tinta); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.dialogo::backdrop { background: rgba(29,42,36,.45); }
+.dialogo header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.dialogo h2 { margin: 0; font-size: 22px; }
 
 /* Aviso */
 .aviso {

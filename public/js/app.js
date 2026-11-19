@@ -5,6 +5,7 @@ const hoy = () => new Date().toISOString().slice(0, 10);
 const fecha = f => f ? new Date(f + 'T00:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '–';
 
 let libros = [], socios = [], prestamos = [], filtro = 'todos';
+const soles = n => 'S/ ' + Number(n || 0).toFixed(2);
 
 function aviso(texto, esError = false) {
   const a = $('#aviso');
@@ -33,6 +34,7 @@ async function cargar() {
     `<option value="${l.id}" ${l.disponibles < 1 ? 'disabled' : ''}>${l.titulo} (${l.disponibles} disp.)</option>`).join('');
   $('#sel-socio').innerHTML = socios.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
   pintarReporte((await api('/reportes/resumen')).datos);
+  pintarMultas((await api('/multas')).datos);
 }
 
 // ---------- Panel
@@ -46,6 +48,8 @@ function pintarReporte(r) {
   const pct = r.totalEjemplares ? Math.round(r.ejemplaresDisponibles / r.totalEjemplares * 100) : 0;
   $('#barra-disp').style.width = pct + '%';
   $('#r-disp').textContent = `${r.ejemplaresDisponibles} de ${r.totalEjemplares} ejemplares en estantería (${pct}%)`;
+  $('#r-multas').textContent = soles(r.multas.pendiente);
+  $('#r-multas-det').textContent = `${r.multas.cantidadPendientes} por cobrar · ${soles(r.multas.enCurso)} en curso`;
   const b = $('#badge-atrasados');
   b.hidden = !r.prestamosAtrasados;
   b.textContent = r.prestamosAtrasados;
@@ -143,8 +147,9 @@ window.eliminarLibro = async id => {
 function pintarSocios(lista) {
   $('#tabla-socios tbody').innerHTML = lista.length ? lista.map(s => {
     const activos = prestamos.filter(p => p.idSocio === s.id && !p.devuelto).length;
-    return `<tr><td><strong>${s.nombre}</strong></td><td>${s.dni}</td><td>${s.correo || '–'}</td><td>${activos} de 3</td></tr>`;
-  }).join('') : '<tr><td colspan="4" class="vacio">No se encontraron socios.</td></tr>';
+    return `<tr><td><strong>${s.nombre}</strong></td><td>${s.dni}</td><td>${s.correo || '–'}</td><td>${activos} de 3</td>
+      <td><button class="secundario" onclick="verHistorial(${s.id})">Historial</button></td></tr>`;
+  }).join('') : '<tr><td colspan="5" class="vacio">No se encontraron socios.</td></tr>';
 }
 $('#buscar-socio').oninput = async e => pintarSocios((await api('/socios?q=' + encodeURIComponent(e.target.value))).datos);
 $('#form-socio').onsubmit = async e => {
@@ -161,7 +166,7 @@ function pintarPrestamos() {
   const etiqueta = { activo: 'Activo', atrasado: 'Atrasado', devuelto: 'Devuelto' };
   $('#tabla-prestamos tbody').innerHTML = lista.length ? lista.map(p => {
     const e = estadoDe(p);
-    const accion = p.devuelto ? `<span class="sub">${fecha(p.fechaDevolucion)}</span>`
+    const accion = p.devuelto ? `<span class="sub">${fecha(p.fechaDevolucion)}</span>${p.multa ? `<span class="multa">Multa ${soles(p.multa)}${p.multaPagada ? ' · pagada' : ''}</span>` : ''}`
       : `<button class="secundario" onclick="devolver(${p.id})">Devolver</button>`;
     return `<tr><td><strong>${nombreLibro(p.idLibro)}</strong></td><td>${nombreSocio(p.idSocio)}</td>
       <td>${fecha(p.fechaPrestamo)}</td><td>${fecha(p.fechaLimite)}</td>
@@ -183,6 +188,42 @@ window.devolver = async id => {
   const r = await api(`/prestamos/${id}/devolver`, { method: 'PUT' });
   aviso(r.ok ? 'Devolución registrada' : r.mensaje, !r.ok);
   cargar();
+};
+
+// ---------- Multas
+const ETIQ_MULTA = { pendiente: 'Pendiente', pagada: 'Pagada', 'en curso': 'En curso' };
+function pintarMultas({ multas, totales }) {
+  $('#m-pendiente').textContent = soles(totales.pendiente);
+  $('#m-cantidad').textContent = `${totales.cantidadPendientes} multa(s) por cobrar`;
+  $('#m-curso').textContent = soles(totales.enCurso);
+  $('#m-cobrado').textContent = soles(totales.cobrado);
+  $('#tarifa-multa').textContent = `${soles(totales.tarifaPorDia)} por cada día de atraso. Un socio con multas pendientes no puede pedir nuevos préstamos.`;
+  const b = $('#badge-multas'); b.hidden = !totales.cantidadPendientes; b.textContent = totales.cantidadPendientes;
+  $('#tabla-multas tbody').innerHTML = multas.length ? multas.map(m => `<tr>
+      <td><strong>${m.socio}</strong></td><td>${m.libro}</td><td>${fecha(m.fechaLimite)}</td><td>${m.diasAtraso}</td><td><strong>${soles(m.monto)}</strong></td>
+      <td><span class="estado ${m.estado.replace(' ', '')}">${ETIQ_MULTA[m.estado]}</span></td>
+      <td>${m.estado === 'pendiente' ? `<button class="primario" onclick="pagarMulta(${m.idPrestamo})">Registrar pago</button>`
+        : (m.estado === 'pagada' ? `<span class="sub">pagó ${fecha(m.fechaPago)}</span>` : '<span class="sub">falta devolver</span>')}</td></tr>`).join('')
+    : '<tr><td colspan="7" class="vacio">No hay multas registradas.</td></tr>';
+}
+window.pagarMulta = async id => {
+  const r = await api(`/multas/${id}/pagar`, { method: 'PUT' });
+  aviso(r.ok ? `Pago de ${soles(r.datos.multa)} registrado` : r.mensaje, !r.ok);
+  cargar();
+};
+
+// ---------- Historial del socio
+window.verHistorial = async id => {
+  const h = (await api(`/socios/${id}/historial`)).datos;
+  $('#h-nombre').textContent = h.socio.nombre;
+  $('#h-resumen').textContent = `DNI ${h.socio.dni} · ${h.total} préstamo(s), ${h.activos} activo(s) · multa pendiente ${soles(h.multaPendiente)}`;
+  $('#h-filas').innerHTML = h.prestamos.length ? h.prestamos.map(p => {
+    const e = estadoDe(p);
+    return `<tr><td><strong>${p.libro}</strong></td><td>${fecha(p.fechaPrestamo)}</td><td>${fecha(p.fechaLimite)}</td><td>${fecha(p.fechaDevolucion)}</td>
+      <td><span class="estado ${e}">${{ activo: 'Activo', atrasado: 'Atrasado', devuelto: 'Devuelto' }[e]}</span></td>
+      <td>${p.multa ? soles(p.multa) + (p.multaPagada ? ' (pagada)' : ' (pendiente)') : '–'}</td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="vacio">Este socio aún no tiene préstamos.</td></tr>';
+  $('#dlg-historial').showModal();
 };
 
 $('#fecha-hoy').textContent = new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });

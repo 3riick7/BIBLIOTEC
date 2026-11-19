@@ -2,6 +2,7 @@ const Libro = require('../models/LibroModel');
 const Socio = require('../models/SocioModel');
 const Prestamo = require('../models/PrestamoModel');
 const { hoy } = require('../helpers/fecha');
+const MultaService = require('./MultaService');
 
 // Resumen general de la biblioteca para el módulo de reportes
 exports.resumen = () => {
@@ -23,6 +24,7 @@ exports.resumen = () => {
     totalSocios: Socio.todos().length,
     prestamosActivos: activos.length,
     prestamosAtrasados: atrasados.length,
-    libroMasPrestado: masPrestado ? masPrestado.titulo : null
+    libroMasPrestado: masPrestado ? masPrestado.titulo : null,
+    multas: MultaService.totales()
   };
 };

@@ -39,3 +39,13 @@ y una portada. Si no se sube una imagen, la interfaz genera una portada con el c
 - `GET /api/libros/categorias` lista las categorías y cuántos libros tiene cada una.
 - `POST /api/libros/:id/portada` recibe `{ "imagen": "data:image/png;base64,..." }` (PNG, JPG o WEBP, máx. 2 MB).
   Las imágenes se guardan en `public/portadas/`, que no se sube al repositorio.
+
+## Multas e historial de socios
+
+Al devolver un libro después de su fecha límite se registra una multa de `MULTA_POR_DIA` soles
+por cada día de atraso (1.00 por defecto, configurable en `.env`). Un socio con multas pendientes
+no puede pedir nuevos préstamos hasta pagarlas.
+
+- `GET /api/multas` lista las multas (pendientes, pagadas y en curso) con sus totales.
+- `PUT /api/multas/:idPrestamo/pagar` registra el pago de una multa.
+- `GET /api/socios/:id/historial` devuelve todos los préstamos de un socio y su deuda pendiente.
