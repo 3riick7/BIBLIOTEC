@@ -25,7 +25,8 @@ document.querySelectorAll('.nav').forEach(b => b.onclick = () => {
 // ---------- Carga general
 async function cargar() {
   [libros, socios, prestamos] = await Promise.all([api('/libros'), api('/socios'), api('/prestamos')]).then(r => r.map(x => x.datos));
-  pintarLibros(libros);
+  filtrarLibros();
+  cargarCategorias();
   pintarSocios(socios);
   pintarPrestamos();
   $('#sel-libro').innerHTML = libros.map(l =>
@@ -59,20 +60,77 @@ const nombreLibro = id => (libros.find(x => x.id === id) || {}).titulo || '–';
 const nombreSocio = id => (socios.find(x => x.id === id) || {}).nombre || '–';
 
 // ---------- Libros
-function pintarLibros(lista) {
-  $('#tabla-libros tbody').innerHTML = lista.length ? lista.map(l => {
-    const pct = l.ejemplares ? l.disponibles / l.ejemplares * 100 : 0;
-    return `<tr><td><strong>${l.titulo}</strong></td><td>${l.autor}</td>
-      <td><div class="disp"><div class="barra"><div style="width:${pct}%"></div></div>${l.disponibles}/${l.ejemplares}</div></td>
-      <td><button class="secundario peligro" onclick="eliminarLibro(${l.id})">Eliminar</button></td></tr>`;
-  }).join('') : '<tr><td colspan="4" class="vacio">No se encontraron libros.</td></tr>';
+let categoria = '';
+const COLORES = { 'Novela': ['1f4d3a', 'e9d8a6'], 'Cuento': ['9b2226', 'f6e7cb'], 'Poesía': ['3d405b', 'f2cc8f'],
+  'Infantil': ['e07a5f', 'fff3e0'], 'Historia': ['6b4f2c', 'efe1c6'], 'Ciencia': ['1d3557', 'a8dadc'], 'Otros': ['495057', 'e9ecef'] };
+
+// Portada: la imagen subida o, si no hay, una portada generada con el color de su categoría
+function portada(l) {
+  if (l.portada) return `<img class="portada" src="${l.portada}" alt="Portada de ${l.titulo}">`;
+  const [fondo, texto] = COLORES[l.categoria] || COLORES.Otros;
+  return `<div class="portada generada" style="--fondo:#${fondo};--texto:#${texto}">
+    <span class="p-cat">${l.categoria || ''}</span><strong>${l.titulo}</strong><span class="p-autor">${l.autor}</span></div>`;
 }
-$('#buscar').oninput = async e => pintarLibros((await api('/libros?q=' + encodeURIComponent(e.target.value))).datos);
+
+function pintarLibros(lista) {
+  $('#catalogo').innerHTML = lista.length ? lista.map(l => {
+    const pct = l.ejemplares ? l.disponibles / l.ejemplares * 100 : 0;
+    return `<article class="libro">
+      ${portada(l)}
+      <div class="libro-info">
+        <span class="etiqueta">${l.categoria || 'Otros'}</span>
+        <strong>${l.titulo}</strong><span class="sub">${l.autor}</span>
+        <div class="disp"><div class="barra"><div style="width:${pct}%"></div></div>${l.disponibles}/${l.ejemplares}</div>
+        <div class="acciones">
+          <button class="secundario" onclick="elegirPortada(${l.id})">Portada</button>
+          <button class="secundario peligro" onclick="eliminarLibro(${l.id})">Eliminar</button>
+        </div>
+      </div></article>`;
+  }).join('') : '<p class="vacio">No se encontraron libros.</p>';
+}
+
+async function cargarCategorias() {
+  const cats = (await api('/libros/categorias')).datos;
+  $('#sel-categoria').innerHTML = cats.map(c => `<option>${c.nombre}</option>`).join('');
+  $('#filtro-categorias').innerHTML = [`<button class="chip ${categoria ? '' : 'activo'}" data-cat="">Todas</button>`]
+    .concat(cats.filter(c => c.libros).map(c => `<button class="chip ${categoria === c.nombre ? 'activo' : ''}" data-cat="${c.nombre}">${c.nombre} <small>${c.libros}</small></button>`)).join('');
+  document.querySelectorAll('#filtro-categorias .chip').forEach(b => b.onclick = () => { categoria = b.dataset.cat; filtrarLibros(); cargarCategorias(); });
+}
+async function filtrarLibros() {
+  const q = encodeURIComponent($('#buscar').value);
+  pintarLibros((await api(`/libros?q=${q}&categoria=${encodeURIComponent(categoria)}`)).datos);
+}
+$('#buscar').oninput = filtrarLibros;
+
+const leerImagen = archivo => new Promise((ok, mal) => {
+  if (archivo.size > 2 * 1024 * 1024) return mal(new Error('La portada no puede pesar más de 2 MB'));
+  const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = mal; r.readAsDataURL(archivo);
+});
+async function subirPortada(id, archivo) {
+  try {
+    const r = await api(`/libros/${id}/portada`, json('POST', { imagen: await leerImagen(archivo) }));
+    if (!r.ok) throw new Error(r.mensaje);
+    return true;
+  } catch (e) { aviso(e.message, true); return false; }
+}
+$('#form-libro input[name=portada]').onchange = e => ($('#nombre-portada').textContent = e.target.files[0] ? e.target.files[0].name : 'Portada…');
 $('#form-libro').onsubmit = async e => {
   e.preventDefault();
-  const r = await api('/libros', json('POST', Object.fromEntries(new FormData(e.target))));
-  aviso(r.ok ? `Libro “${r.datos.titulo}” agregado` : r.mensaje, !r.ok);
-  if (r.ok) { e.target.reset(); cargar(); }
+  const datos = Object.fromEntries(new FormData(e.target));
+  const archivo = e.target.portada.files[0];
+  delete datos.portada;
+  const r = await api('/libros', json('POST', datos));
+  if (!r.ok) return aviso(r.mensaje, true);
+  if (archivo) await subirPortada(r.datos.id, archivo);
+  aviso(`Libro “${r.datos.titulo}” agregado`);
+  e.target.reset(); $('#nombre-portada').textContent = 'Portada…';
+  cargar();
+};
+let libroPortada = null;
+window.elegirPortada = id => { libroPortada = id; $('#cambiar-portada').click(); };
+$('#cambiar-portada').onchange = async e => {
+  const archivo = e.target.files[0]; e.target.value = '';
+  if (archivo && await subirPortada(libroPortada, archivo)) { aviso('Portada actualizada'); cargar(); }
 };
 window.eliminarLibro = async id => {
   if (prestamos.some(p => p.idLibro === id && !p.devuelto)) return aviso('No se puede eliminar: el libro tiene préstamos activos', true);
@@ -110,9 +168,9 @@ function pintarPrestamos() {
       <td><span class="estado ${e}">${etiqueta[e]}</span></td><td>${accion}</td></tr>`;
   }).join('') : '<tr><td colspan="6" class="vacio">No hay préstamos en esta categoría.</td></tr>';
 }
-document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+document.querySelectorAll('#vista-prestamos .chip').forEach(c => c.onclick = () => {
   filtro = c.dataset.filtro;
-  document.querySelectorAll('.chip').forEach(x => x.classList.toggle('activo', x === c));
+  document.querySelectorAll('#vista-prestamos .chip').forEach(x => x.classList.toggle('activo', x === c));
   pintarPrestamos();
 });
 $('#form-prestamo').onsubmit = async e => {

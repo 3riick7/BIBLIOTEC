@@ -59,18 +59,23 @@
     <!-- LIBROS -->
     <section id="vista-libros" class="vista">
       <header class="titulo">
-        <div><h1>Libros</h1><p class="sub">Catálogo y ejemplares disponibles</p></div>
+        <div><h1>Libros</h1><p class="sub">Catálogo, categorías y ejemplares disponibles</p></div>
         <input id="buscar" class="buscador" placeholder="Buscar por título o autor">
       </header>
       <form id="form-libro" class="caja formulario">
         <input name="titulo" placeholder="Título" required>
         <input name="autor" placeholder="Autor" required>
+        <select name="categoria" id="sel-categoria" title="Categoría"></select>
         <input name="ejemplares" type="number" min="1" value="1" title="Ejemplares">
+        <label class="archivo" title="Portada (opcional)">
+          <input type="file" name="portada" accept="image/png,image/jpeg,image/webp" hidden>
+          <span id="nombre-portada">Portada…</span>
+        </label>
         <button class="primario">Agregar libro</button>
       </form>
-      <div class="caja"><table id="tabla-libros">
-        <thead><tr><th>Título</th><th>Autor</th><th>Disponibles</th><th></th></tr></thead><tbody></tbody>
-      </table></div>
+      <div id="filtro-categorias" class="filtros"></div>
+      <div id="catalogo" class="catalogo"></div>
+      <input type="file" id="cambiar-portada" accept="image/png,image/jpeg,image/webp" hidden>
     </section>
 
     <!-- SOCIOS -->

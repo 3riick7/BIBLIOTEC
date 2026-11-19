@@ -9,3 +9,7 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+
+# Portadas subidas desde la aplicación (datos locales de cada instalación)
+public/portadas/*
+!public/portadas/.gitkeep

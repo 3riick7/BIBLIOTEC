@@ -29,3 +29,13 @@ Abrir http://localhost:3000
 `GET /api/reportes/resumen` devuelve el total de libros y ejemplares, socios,
 préstamos activos, préstamos atrasados y el libro más prestado.
 La interfaz muestra este resumen en la sección Reportes.
+
+## Catálogo con portadas y categorías
+
+Cada libro tiene una categoría (Novela, Cuento, Poesía, Infantil, Historia, Ciencia u Otros)
+y una portada. Si no se sube una imagen, la interfaz genera una portada con el color de su categoría.
+
+- `GET /api/libros?categoria=Novela` filtra por categoría.
+- `GET /api/libros/categorias` lista las categorías y cuántos libros tiene cada una.
+- `POST /api/libros/:id/portada` recibe `{ "imagen": "data:image/png;base64,..." }` (PNG, JPG o WEBP, máx. 2 MB).
+  Las imágenes se guardan en `public/portadas/`, que no se sube al repositorio.

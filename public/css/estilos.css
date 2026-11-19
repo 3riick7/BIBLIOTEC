@@ -101,6 +101,31 @@ td:last-child { text-align: right; }
 .chip { border: 1px solid var(--linea); background: var(--tarjeta); border-radius: 999px; padding: 6px 14px; }
 .chip.activo { background: var(--tinta); color: #fff; border-color: var(--tinta); }
 
+/* Catálogo con portadas */
+.catalogo { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.libro { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; display: flex; flex-direction: column; }
+.portada { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; display: block; background: var(--linea); }
+.portada.generada {
+  background: var(--fondo); color: var(--texto); padding: 18px 16px; display: flex; flex-direction: column; justify-content: center; gap: 10px;
+  position: relative; text-align: center; box-shadow: inset 10px 0 0 rgba(0,0,0,.18);
+}
+.portada.generada::before, .portada.generada::after { content: ''; position: absolute; left: 22px; right: 12px; height: 2px; background: var(--texto); opacity: .55; }
+.portada.generada::before { top: 14%; } .portada.generada::after { bottom: 14%; }
+.portada.generada strong { font: 700 20px/1.15 'Fraunces', Georgia, serif; }
+.p-cat { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.p-autor { font-size: 12px; opacity: .85; }
+.libro-info { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.libro-info strong { font-size: 15px; line-height: 1.25; }
+.libro-info .sub { margin: 0; font-size: 13px; }
+.libro-info .disp { margin: 6px 0; font-size: 13px; }
+.etiqueta { align-self: flex-start; font-size: 11px; font-weight: 600; color: var(--verde); background: var(--verde-claro); border-radius: 999px; padding: 2px 8px; }
+.acciones { display: flex; gap: 6px; margin-top: auto; padding-top: 6px; }
+.acciones button { flex: 1; font-size: 13px; }
+.archivo { flex: 0 1 150px; border: 1px dashed var(--linea); border-radius: 10px; background: #fff; padding: 10px 12px; cursor: pointer; color: var(--suave);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.archivo:hover { border-color: var(--verde); color: var(--verde); }
+.chip small { opacity: .6; margin-left: 2px; }
+
 /* Aviso */
 .aviso {
   position: fixed; bottom: 24px; right: 24px; background: var(--tinta); color: #fff; padding: 12px 18px;
