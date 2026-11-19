@@ -166,4 +166,8 @@ td:last-child { text-align: right; }
   .tarjetas, #vista-panel .tarjetas { grid-template-columns: repeat(2, 1fr); }
   .dos-columnas { grid-template-columns: 1fr; }
   .caja { overflow-x: auto; }
+  .catalogo { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .portada.generada { padding: 12px 10px; }
+  .portada.generada strong { font-size: 15px; }
+  .acciones { flex-direction: column; }
 }
