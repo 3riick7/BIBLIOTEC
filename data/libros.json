@@ -1,23 +1,74 @@
 [
   {
     "id": 1,
-    "titulo": "Cien a\u00f1os de soledad",
-    "autor": "Gabriel Garc\u00eda M\u00e1rquez",
+    "titulo": "Cien años de soledad",
+    "autor": "Gabriel García Márquez",
     "ejemplares": 3,
-    "disponibles": 3
+    "disponibles": 3,
+    "categoria": "Novela",
+    "portada": null
   },
   {
     "id": 2,
     "titulo": "La ciudad y los perros",
     "autor": "Mario Vargas Llosa",
     "ejemplares": 2,
-    "disponibles": 2
+    "disponibles": 2,
+    "categoria": "Novela",
+    "portada": null
   },
   {
     "id": 3,
     "titulo": "El Principito",
-    "autor": "Antoine de Saint-Exup\u00e9ry",
+    "autor": "Antoine de Saint-Exupéry",
     "ejemplares": 4,
-    "disponibles": 4
+    "disponibles": 4,
+    "categoria": "Infantil",
+    "portada": null
+  },
+  {
+    "id": 4,
+    "titulo": "Los ríos profundos",
+    "autor": "José María Arguedas",
+    "ejemplares": 2,
+    "disponibles": 2,
+    "categoria": "Novela",
+    "portada": null
+  },
+  {
+    "id": 5,
+    "titulo": "Paco Yunque",
+    "autor": "César Vallejo",
+    "ejemplares": 3,
+    "disponibles": 3,
+    "categoria": "Cuento",
+    "portada": null
+  },
+  {
+    "id": 6,
+    "titulo": "Los heraldos negros",
+    "autor": "César Vallejo",
+    "ejemplares": 2,
+    "disponibles": 2,
+    "categoria": "Poesía",
+    "portada": null
+  },
+  {
+    "id": 7,
+    "titulo": "Tradiciones peruanas",
+    "autor": "Ricardo Palma",
+    "ejemplares": 3,
+    "disponibles": 3,
+    "categoria": "Historia",
+    "portada": null
+  },
+  {
+    "id": 8,
+    "titulo": "Breve historia del tiempo",
+    "autor": "Stephen Hawking",
+    "ejemplares": 1,
+    "disponibles": 1,
+    "categoria": "Ciencia",
+    "portada": null
   }
 ]
