@@ -22,6 +22,7 @@
       <button class="nav" data-vista="libros">Libros</button>
       <button class="nav" data-vista="socios">Socios</button>
       <button class="nav" data-vista="prestamos">Préstamos <span id="badge-atrasados" class="badge-nav" hidden></span></button>
+      <button class="nav" data-vista="reservas">Reservas <span id="badge-reservas" class="badge-nav aviso-nav" hidden></span></button>
       <button class="nav" data-vista="multas">Multas <span id="badge-multas" class="badge-nav" hidden></span></button>
     </nav>
     <p class="pie-lateral">Node.js · Express · Git</p>
@@ -41,6 +42,7 @@
         <article class="tarjeta"><span>Socios</span><strong id="r-socios">–</strong><small>registrados</small></article>
         <article class="tarjeta"><span>Préstamos activos</span><strong id="r-activos">–</strong><small>sin devolver</small></article>
         <article class="tarjeta alerta"><span>Atrasados</span><strong id="r-atrasados">–</strong><small>pasaron su fecha límite</small></article>
+        <article class="tarjeta"><span>Reservas</span><strong id="r-reservas">–</strong><small id="r-reservas-det">listas para recoger</small></article>
         <article class="tarjeta alerta"><span>Multas pendientes</span><strong id="r-multas">–</strong><small id="r-multas-det">por cobrar</small></article>
       </div>
       <div class="dos-columnas">
@@ -105,8 +107,9 @@
       <form id="form-prestamo" class="caja formulario">
         <select id="sel-libro" title="Libro"></select>
         <select id="sel-socio" title="Socio"></select>
-        <button class="primario">Registrar préstamo</button>
+        <button class="primario" id="btn-prestar">Registrar préstamo</button>
       </form>
+      <p class="nota" id="nota-reserva" hidden></p>
       <div class="filtros">
         <button class="chip activo" data-filtro="todos">Todos</button>
         <button class="chip" data-filtro="activos">Activos</button>
@@ -117,6 +120,21 @@
         <thead><tr><th>Libro</th><th>Socio</th><th>Préstamo</th><th>Límite</th><th>Estado</th><th></th></tr></thead><tbody></tbody>
       </table></div>
     </section>
+    <!-- RESERVAS -->
+    <section id="vista-reservas" class="vista">
+      <header class="titulo">
+        <div><h1>Reservas</h1><p class="sub">Cola de espera de los libros sin ejemplares disponibles</p></div>
+      </header>
+      <div class="tarjetas">
+        <article class="tarjeta"><span>Listas para recoger</span><strong id="rv-listas">–</strong><small>ejemplar apartado por 3 días</small></article>
+        <article class="tarjeta"><span>En cola</span><strong id="rv-cola">–</strong><small>esperando que se devuelva un ejemplar</small></article>
+      </div>
+      <p class="nota">Para reservar, elige en <strong>Préstamos</strong> un libro agotado: el botón cambia a “Reservar”. Cuando se devuelve un ejemplar, queda apartado para el primero de la cola.</p>
+      <div class="caja"><table id="tabla-reservas">
+        <thead><tr><th>Libro</th><th>Socio</th><th>Reservado</th><th>Estado</th><th></th></tr></thead><tbody></tbody>
+      </table></div>
+    </section>
+
     <!-- MULTAS -->
     <section id="vista-multas" class="vista">
       <header class="titulo">
