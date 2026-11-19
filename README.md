@@ -60,3 +60,12 @@ el ejemplar pasa al siguiente de la cola o vuelve al catálogo.
 - `GET /api/reservas` lista las reservas con su estado y su puesto en la cola.
 - `POST /api/reservas` recibe `{ "idLibro": 8, "idSocio": 2 }` (solo para libros agotados).
 - `PUT /api/reservas/:id/cancelar` cancela una reserva.
+
+## Diseño de la interfaz
+
+La interfaz usa una paleta índigo con acentos coral y se adapta a tres tamaños de pantalla:
+
+- **Computadora:** barra lateral con íconos y nombres de cada vista.
+- **Tablet (hasta 1000 px):** barra lateral compacta, solo con íconos.
+- **Celular (hasta 760 px):** barra superior con menú desplegable; las tablas se muestran
+  como tarjetas apiladas y el catálogo en dos columnas.
