@@ -17,8 +17,29 @@ function aviso(texto, esError = false) {
 
 const estadoDe = p => p.devuelto ? 'devuelto' : (p.fechaLimite < hoy() ? 'atrasado' : 'activo');
 
+// ---------- Menú en celular
+const lateral = document.querySelector('.lateral');
+$('#btn-menu').onclick = () => {
+  const abierta = lateral.classList.toggle('abierta');
+  $('#btn-menu').setAttribute('aria-expanded', abierta);
+};
+
+// En pantallas pequeñas las tablas se muestran como tarjetas: cada celda toma el nombre de su columna
+function etiquetar(tabla) {
+  const nombres = [...tabla.querySelectorAll('thead th')].map(th => th.textContent.trim());
+  tabla.querySelectorAll('tbody tr').forEach(tr => [...tr.children].forEach((td, i) => {
+    if (!td.hasAttribute('colspan')) td.dataset.label = nombres[i] || '';
+  }));
+}
+document.querySelectorAll('table').forEach(t => {
+  etiquetar(t);
+  new MutationObserver(() => etiquetar(t)).observe(t.querySelector('tbody'), { childList: true });
+});
+
 // ---------- Navegación entre vistas
 document.querySelectorAll('.nav').forEach(b => b.onclick = () => {
+  lateral.classList.remove('abierta');
+  window.scrollTo({ top: 0 });
   document.querySelectorAll('.nav').forEach(x => x.classList.toggle('activo', x === b));
   document.querySelectorAll('.vista').forEach(v => v.classList.toggle('activa', v.id === 'vista-' + b.dataset.vista));
 });
@@ -76,7 +97,7 @@ const COLORES = { 'Novela': ['1f4d3a', 'e9d8a6'], 'Cuento': ['9b2226', 'f6e7cb']
 function portada(l) {
   if (l.portada) return `<img class="portada" src="${l.portada}" alt="Portada de ${l.titulo}">`;
   const [fondo, texto] = COLORES[l.categoria] || COLORES.Otros;
-  return `<div class="portada generada" style="--fondo:#${fondo};--texto:#${texto}">
+  return `<div class="portada generada" style="--pfondo:#${fondo};--texto:#${texto}">
     <span class="p-cat">${l.categoria || ''}</span><strong>${l.titulo}</strong><span class="p-autor">${l.autor}</span></div>`;
 }
 
